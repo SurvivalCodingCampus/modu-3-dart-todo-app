@@ -1,0 +1,142 @@
+@startuml
+
+' Layout configurations
+skinparam linetype ortho
+left to right direction
+
+package "Dart Todo Application" {
+scale 1
+  ' Models
+  class Todo {
+    + int userId
+    + int id
+    + String title
+    + bool completed
+    + DateTime createdAt
+    --
+    + factory Todo.fromJson()
+    + Map<String, dynamic> toJson()
+    + Todo copyWith()
+    + bool operator ==()
+    + int get hashCode
+    + String toString()
+  }
+
+  ' Data Sources
+  abstract class FileDefaultDataSource {
+    + Future<void> createFile()
+    + Future<bool> isFileExist()
+    + Future<String> getFile()
+    + Future<void> writeFile()
+  }
+
+together {
+interface TodoDataSource {
+    + Future<List<Map<String, dynamic>>> readTodos()
+    + Future<void> writeTodos()
+  }
+
+  class TodoDataSourceImpl extends FileDefaultDataSource implements TodoDataSource {
+    - static const String _todoPath
+    - static const String _tempPath
+    --
+    + Future<List<Map<String, dynamic>>> readTodos()
+    + Future<void> writeTodos()
+  }
+
+  ' Repositories
+  interface TodoRepository {
+    + Future<List<Todo>> getTodos()
+    + Future<void> addTodo()
+    + Future<void> updateTodo()
+    + Future<bool> toggleTodo()
+    + Future<void> deleteTodo()
+    + Future<int> getLastIndex()
+  }
+
+  class TodoRepositoryImpl implements TodoRepository {
+    - TodoDataSource _todoDataSource
+  }
+}
+
+together {
+  interface LogRepository {
+    + Future<void> saveLog()
+    + Future<String> readLog()
+  }
+
+  class LogRepositoryImpl implements LogRepository {
+    - LogDataSource _logDataSource
+  }
+
+  ' Managers and Operators
+  class LogOperator {
+    - LogRepository _logRepository
+    --
+    + Future<void> log()
+  }
+
+  interface LogDataSource {
+    + Future<void> writeLog()
+    + Future<String> readLog()
+  }
+
+  class LogDataSourceImpl extends FileDefaultDataSource implements LogDataSource {
+    - static const String logPath
+  }
+}
+
+
+  abstract class TodoCliManager {
+    + TodoRepository todoRepository
+    + LogOperator logOperator
+    --
+    + Future<Action> execute()
+    + void start()
+    + Future<Action> executeFromInput()
+    + TodoCliManager fromInput()
+    + TodoCliManager displayModeFromInput()
+  }
+
+  ' Enums and Constants
+  together {
+  enum TodoCondition {
+      base
+      isAscending
+      isDescending
+      isCompleted
+      isNotCompleted
+      --
+      + String get name
+    }
+
+    enum LogCondition {
+      show
+      add
+      update
+      toggle
+      delete
+      end
+      --
+      + LogCondition convertLogCondition(String value)
+    }
+  }
+
+
+  class Action {
+    + bool shouldExit
+    --
+    + const Action exit
+    + const Action continueAction
+  }
+
+  LogOperator --> LogRepository : 의존 >
+  LogRepositoryImpl --> LogDataSource : 의존 >
+
+  TodoRepositoryImpl --> TodoDataSource : 의존 >
+
+  TodoCliManager --> TodoRepository : 의존 >
+  TodoCliManager --> LogOperator : 의존 >
+}
+
+@enduml

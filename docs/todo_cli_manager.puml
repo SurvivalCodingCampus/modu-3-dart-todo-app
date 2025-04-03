@@ -1,0 +1,71 @@
+@startuml
+
+' Layout configurations
+skinparam linetype ortho
+left to right direction
+
+abstract class TodoCliManager {
+  + TodoRepository todoRepository
+  + LogOperator logOperator
+  --
+  + Future<Action> execute()
+  + {static} void start()
+  + {static} Future<Action> executeFromInput()
+  + {static} TodoCliManager fromInput()
+  + {static} TodoCliManager displayModeFromInput()
+}
+
+' Command outputs grouped on the right side
+together {
+  class ViewTodosOutput extends TodoCliManager {
+  }
+
+  class AddTodoOutput extends TodoCliManager {
+  }
+
+  class UpdateTodoOutput extends TodoCliManager {
+  }
+
+  class ToggleTodoOutput extends TodoCliManager {
+  }
+
+  class DeleteTodoOutput extends TodoCliManager {
+  }
+
+  class ExitOutput extends TodoCliManager {
+  }
+
+  class RetryOutput extends TodoCliManager {
+  }
+
+  class AscendingOutput extends TodoCliManager {
+    - {static} TodoCondition _condition
+  }
+
+  class DescendingOutput extends TodoCliManager {
+    - {static} TodoCondition _condition
+  }
+
+  class CompletedOutput extends TodoCliManager {
+    - {static} TodoCondition _condition
+  }
+
+  class NotCompletedOutput extends TodoCliManager {
+    - {static} TodoCondition _condition
+  }
+}
+
+' Force right alignment of subclasses
+TodoCliManager -[hidden]-> ViewTodosOutput
+TodoCliManager -[hidden]-> AddTodoOutput
+TodoCliManager -[hidden]-> UpdateTodoOutput
+TodoCliManager -[hidden]-> ToggleTodoOutput
+TodoCliManager -[hidden]-> DeleteTodoOutput
+TodoCliManager -[hidden]-> ExitOutput
+TodoCliManager -[hidden]-> RetryOutput
+TodoCliManager -[hidden]-> AscendingOutput
+TodoCliManager -[hidden]-> DescendingOutput
+TodoCliManager -[hidden]-> CompletedOutput
+TodoCliManager -[hidden]-> NotCompletedOutput
+
+@enduml
