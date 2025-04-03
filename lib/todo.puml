@@ -1,0 +1,62 @@
+@startuml
+
+
+
+class TodoRepositoryImpl implements TodoRepository{
+     @Future<List<Todo>> getTodos();
+     @Future<void> addTodo(String title);
+     @Future<void> updateTodo(int id, String title);
+     @Future<void> toggleTodo(int id);
+     @Future<void> deleteTOdo(int id);
+     @Future<List<Todo>> getSortedDate(int flag);
+     @Future<List<Todo>> getToggleTodo(bool completed);
+     - @Future<void> _writeLogTodo();
+
+}
+
+interface TodoRepository {
+    Future<List<Todo>> getTodos();
+    Future<void> addTodo(String title);
+    Future<void> updateTodo(int id, String title);
+    Future<void> toggleTodo(int id);
+    Future<void> deleteTodo(int id);
+    Future<List<Todo>> getSortedDate(bool ascending);
+    Future<List<Todo>> getToggleTodo(bool completed);
+    - Future<void> _writeLogTodo();
+}
+
+
+
+class TodoDataSourceImpl implements TodoDataSource{
+    @Future<List<Map<String, dynamic>>> readTodos();
+
+
+    @Future<void> writeTodos(<List<Map<String, dynamic>>>);
+}
+
+
+interface TodoDataSource {
+    Future<List<Map<String, dynamic>>> readTodos();
+
+    Future<void> writeTodos(<List<Map<String, dynamic>>>);
+}
+
+class Todo {
+    + int userId;
+    + int id;
+    + String title;
+    + bool completed;
+    + DateTime createdAt;
+
+    void copyWith();
+    void toJson();
+    void fromJson();
+    void toString();
+    void hashCode();
+    void ==();
+}
+
+TodoRepositoryImpl --> Todo
+TodoRepositoryImpl --> TodoDataSource
+
+@enduml
