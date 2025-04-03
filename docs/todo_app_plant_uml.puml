@@ -1,0 +1,72 @@
+@startuml
+
+skinparam classAttributeIconSize 0
+
+package "Model" {
+  class Todo {
+    - int userId
+    - int id
+    - String title
+    - bool completed
+    - DateTime createdAt
+    + Todo.fromJson(Map<String, dynamic>)
+    + Map<String, dynamic> toJson()
+    + Todo copyWith(...)
+    + operator ==(...)
+    + hashCode()
+  }
+}
+
+package "DataSource" {
+  interface DataSource {
+    + Future<List<Map<String, dynamic>>> readTodos()
+    + Future<void> writeTodos(List<Map<String, dynamic>> todos)
+  }
+
+  class TodoDataSourceImpl {
+    - String path
+    + readTodos()
+    + writeTodos()
+  }
+
+  DataSource <|.. TodoDataSourceImpl
+}
+
+package "Repository" {
+  interface TodoRepository {
+    + Future<List<Todo>> getTodos()
+    + Future<void> addTodo(String title)
+    + Future<void> updateTodo(int id, String newTitle)
+    + Future<void> toggleTodo(int id)
+    + Future<void> deleteTodo(int id)
+  }
+
+  class TodoRepositoryImpl {
+    - DataSource datasource
+    + getTodos()
+    + addTodo()
+    + updateTodo()
+    + toggleTodo()
+    + deleteTodo()
+  }
+
+  TodoRepository <|.. TodoRepositoryImpl
+  TodoRepositoryImpl --> DataSource
+}
+
+package "ViewModel" {
+  class CliUtils {
+    - TodoRepository repository
+    - AppLog logger
+    + processCommand()
+    + addTodo()
+    + updateTodo()
+    + toggleTodo()
+    + deleteTodo()
+    + showTodos()
+  }
+
+  CliUtils --> TodoRepository
+}
+
+@enduml
