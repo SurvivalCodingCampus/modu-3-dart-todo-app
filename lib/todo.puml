@@ -1,0 +1,47 @@
+@startuml
+
+class Todo {
+    int userId
+    int id
+    String title
+    bool completed
+    DateTime createdAt
+
+    +fromJson(Map<String, dynamic>)
+    +toJson()
+    +copyWith()
+    +operator ==(Object other)
+    +get hashCode()
+}
+
+interface TodoDataSource {
+    {abstract} +Future<List<Map<String, dynamic>>> readTodos()
+    {abstract} +Future<void> writeTodos(List<Map<String, dynamic>> todos)
+}
+
+interface TodoRepository {
+    {abstract} +Future<List<Todo>> getTodos()
+    {abstract} +Future<void> addTodo(String title)
+    {abstract} +Future<void> updateTodo(int id, String newTitle)
+    {abstract} +Future<void> toggleTodo(int id)
+    {abstract} +Future<void> deleteTodo(int id)
+}
+
+class TodoDataSourceImpl implements TodoDataSource {
+    +Future<List<Map<String, dynamic>>> readTodos()
+    +Future<void> writeTodos(List<Map<String, dynamic>> todos)
+}
+
+class TodoRepositoryImpl implements TodoRepository{
+    - TodoDataSource _dataSource
+    +Future<List<Todo>> getTodos()
+    +Future<void> addTodo(String title)
+    +Future<void> updateTodo(int id, String newTitle)
+    +Future<void> toggleTodo(int id)
+    +Future<void> deleteTodo(int id)
+}
+
+
+TodoRepository --> TodoDataSource : uses
+TodoRepository --> Todo : uses
+@enduml
