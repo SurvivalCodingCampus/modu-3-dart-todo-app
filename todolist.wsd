@@ -1,0 +1,82 @@
+@startuml TODOLIST
+
+class Todo {
+  - int userId
+  - int id
+  - String title
+  - bool completed
+  - DateTime createdAt
+
+  + Todo(userId: int, id: int, title: String, completed: bool, createdAt: DateTime)
+  + Map<String, dynamic> toJson()
+  + static Todo fromJson(Map<String, dynamic> json)
+  + bool operator==(Object other)
+  + int hashCode
+  + String toString()
+  + Todo copyWith(userId?: int, id?: int, title?: String, completed?: bool, createdAt?: DateTime)
+}
+
+interface TodoRepository {
+  + getTodos(): Future<List<Todo>>
+  + addTodo(title: String): Future<void>
+  + updateTodo(id: int, newTitle: String): Future<void>
+  + deleteTodo(id: int): Future<void>
+  + toggleTodo(id: int): Future<void>
+}
+
+class TodoRepositoryImpl {
+  - TodoDataSource _todoDataSource
+
+  + TodoRepositoryImpl(_todoDataSource: TodoDataSource)
+  + getTodos(): Future<List<Todo>>
+  + addTodo(title: String): Future<void>
+  + updateTodo(id: int, newTitle: String): Future<void>
+  + deleteTodo(id: int): Future<void>
+  + toggleTodo(id: int): Future<void>
+}
+
+interface TodoDataSource {
+  + readTodo(): Future<List<Map<String, dynamic>>>
+  + writeTodo(todos: List<Map<String, dynamic>>): Future<void>
+}
+
+class TodoDataSourceImpl {
+  - String filePath
+  + readTodo(): Future<List<Map<String, dynamic>>>
+  + writeTodo(todos: List<Map<String, dynamic>>): Future<void>
+}
+
+class TodoView {
+  - TodoRepository _todoRepository
+  + listView(): Future<void>
+  + addView(): Future<void>
+  + updateView(): Future<void>
+  + deleteView(): Future<void>
+  + toggleView(): Future<void>
+}
+
+class Main {
+  + main(): void
+  + printMenu(): void
+}
+
+class LogService {
+  - File? _logFile
+  
+  + LogService(String logFilePath)
+  + log(String message): Future<void>
+}
+
+
+' 관계 설정
+
+Main --> TodoView : 사용
+TodoView --> TodoRepositoryImpl : 의존
+TodoRepository ..|> TodoRepositoryImpl : 구현
+TodoRepositoryImpl --> TodoDataSourceImpl : 의존
+TodoDataSourceImpl ..|> TodoDataSource : 구현
+TodoRepositoryImpl --> Todo : 관리
+TodoDataSourceImpl --> Todo : 저장 및 변환
+LogService --> File : 파일에 로그 작성
+
+@enduml
